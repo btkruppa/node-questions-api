@@ -1,6 +1,6 @@
 import aws from 'aws-sdk';
 import { ConfigurationOptions } from 'aws-sdk/lib/config';
-import { ReimbursementDoc } from '../entities/ReimbursementDoc';
+import { ReimbursementDoc } from '../model/ReimbursementDoc';
 import { PromiseResult } from 'aws-sdk/lib/request';
 
 const awsConfig: ConfigurationOptions = {

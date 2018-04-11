@@ -2,15 +2,11 @@ import express from 'express';
 import path from 'path';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
+import { NextFunction } from 'express-serve-static-core';
+import { QuestionController } from './controllers/QuestionController';
+
 // Load environment variables from .env file, where API keys and passwords are configured
 // dotenv.config({ path: '.env.example' });
-
-
-import { User } from './entities/User';
-import { userRouter } from './controllers/UserController';
-import { movieRouter } from './controllers/MovieController';
-import { reimbursementRouter } from './controllers/ReimbursementController';
-import { NextFunction } from 'express-serve-static-core';
 
 
 const app = express();
@@ -19,29 +15,52 @@ console.log(process.env.PORT);
 const port = process.env.PORT || 3000;
 app.set('port', port);
 
+/**
+ * Allow express to serve up static content
+ */
 app.use(
   express.static(path.join(__dirname, 'public'))
 );
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
-
-app.use((req, res, next) => {
-  console.log(`request made with path ${req.path} and type ${req.method}`);
-  next();
-});
-
-/************************************************************************
- * API ROUTES
- ***********************************************************************/
+/**
+ * Allow the single page application to be served up
+ */
 app.get('/page', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
 
 
-app.use('/users', userRouter);
-app.use('/movies', movieRouter);
-app.use('/reimbursements', reimbursementRouter);
+/**
+ * Setup bodyParser so we can easily use the request body in controllers
+ */
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+
+
+/**
+ * Logg the request being made
+ */
+app.use((req, res, next) => {
+  console.log(`request made with path ${req.path} and type ${req.method}`);
+  next();
+});
+
+/**
+ * Set Headers to allow cors and set content type to json
+ */
+app.use((req, res, next) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
+
+/************************************************************************
+ * API ROUTES
+ ***********************************************************************/
+app.use('/questions', QuestionController);
 
 
 app.listen(port, () => {
